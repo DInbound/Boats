@@ -61,7 +61,7 @@ namespace Surface
             Vector3 point01 = q * new Vector3(-0.5f, 0.5f) + offset;
             Vector3 point11 = q * new Vector3(0.5f, 0.5f) + offset;
 
-            NoiseMethod method = Noise.methods[(int)type][dimensions - 1];
+            NoiseMethod method = Noise.noiseMethods[(int)type][dimensions - 1];
             float stepSize = 1f / size;
             for (int v = 0, y = 0; y <= size; y++)
             {
