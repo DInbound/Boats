@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using Surface;
 
 
 [CustomEditor(typeof(SurfaceCreator))]
