@@ -7,7 +7,6 @@ public class BoatPart : MonoBehaviour
     /// Local coordinates of center of mass.
     /// </summary>
     public Vector3 CenterOfMass = new Vector3(0, 0, 0);
-    [Range(0, 100)]
     public float Mass = 0.1f;
 
     public float GetDensity()

@@ -4,13 +4,15 @@ using System.Collections.Generic;
 
 public class ShipBehaviour : MonoBehaviour
 {
+    public bool Controllable = false;
+
     public List<GameObject> Parts = new List<GameObject>();
 
     public Rigidbody myBody;
 
     public float ShipVolume = 0;
-    public float ShipDensity = 0;
     public float ShipMass = 0;
+    public float ShipDensity = 0;
 
     private WaterMeshMaker _wmm;
 
@@ -33,23 +35,25 @@ public class ShipBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
     }
 
     // Physics update
     void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.W))
-            myBody.AddRelativeForce(Vector3.forward * 100f);
+        if (Controllable)
+        {
+            if (Input.GetKey(KeyCode.W))
+                myBody.AddRelativeForce(Vector3.forward * 100f);
 
-        if (Input.GetKey(KeyCode.S))
-            myBody.AddRelativeForce(Vector3.forward * -100f);
+            if (Input.GetKey(KeyCode.S))
+                myBody.AddRelativeForce(Vector3.forward * -100f);
 
-        if (Input.GetKey(KeyCode.D))
-            myBody.AddRelativeTorque(Vector3.up * -100f);
+            if (Input.GetKey(KeyCode.D))
+                myBody.AddRelativeTorque(Vector3.up * -100f);
 
-        if (Input.GetKey(KeyCode.A))
-            myBody.AddRelativeTorque(Vector3.up * 100f);
+            if (Input.GetKey(KeyCode.A))
+                myBody.AddRelativeTorque(Vector3.up * 100f);
+        }
 
         FloatyBoaty();
     }
@@ -65,7 +69,7 @@ public class ShipBehaviour : MonoBehaviour
             float distance = _wmm.CalculateY(com) - com.y;
             // TODO Take in account the amount of buoyancy the ship has.
             // Calculate the amount of force that should be applied.
-            float force = 9.81f * distance / ShipDensity;
+            float force = 9.81f * distance;
 
             // Add the force
             myBody.AddForceAtPosition(Vector3.up * force, com);
@@ -76,19 +80,24 @@ public class ShipBehaviour : MonoBehaviour
     private void UpdatePartStats()
     {
         float totalDensity = 0;
+        float totalVolume = 0;
+        float totalMass = 0;
         int amount = 0;
 
         foreach (GameObject part in Parts)
         {
             BoatPart boatPartScript = part.GetComponent<BoatPart>();
             // NEEDS FIX
-            ShipVolume += boatPartScript.GetVolume();
+            totalVolume += boatPartScript.GetVolume();
             totalDensity += boatPartScript.GetDensity();
-            ShipMass += boatPartScript.Mass;
+            totalMass += boatPartScript.Mass;
             amount++;
         }
 
         this.GetComponent<Rigidbody>().mass = ShipMass;
+
         ShipDensity = totalDensity / amount;
+        ShipVolume = totalVolume;
+        ShipMass = totalMass;
     }
 }

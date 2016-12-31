@@ -6,17 +6,28 @@ public class WaterMeshMaker : MonoBehaviour
 {
     public Mesh mesh;
 
+    [Range(1, 100)]
     public int sizeX;
+    [Range(1, 100)]
     public int sizeY;
 
-    public float waveHeight;
-    public float waveFreq;
+    [Range(0.01f, 5)]
+    public float WaveAmplitude = 1;
+    [Range(0.01f, 5)]
+    public float WaveFrequency = 1;
+    [Range(0.01f, 5)]
+    public float WaveSpeed = 1;
 
     void Start()
     {
     }
 
     void Update()
+    {
+        GenerateMesh();
+    }
+
+    private void GenerateMesh()
     {
         List<Vector3> verts = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
@@ -65,7 +76,7 @@ public class WaterMeshMaker : MonoBehaviour
     public float CalculateY(Vector3 pos)
     {
         //waveHeight * Mathf.PerlinNoise(i + waveFreq * Time.time, j + waveFreq * Time.time)
-        return waveHeight * Mathf.Sin(pos.x + Time.time + waveFreq) * Mathf.Sin(pos.z + Time.time + waveFreq);
+        return calcY(pos.x, pos.z);
     }
 
     /// <summary>
@@ -76,6 +87,16 @@ public class WaterMeshMaker : MonoBehaviour
     /// <returns>The Y value of the water at a specific point.</returns>
     public float CalculateY(float x, float z)
     {
-        return waveHeight * Mathf.Sin(x + Time.time + waveFreq) * Mathf.Sin(z + Time.time + waveFreq);
+        return calcY(x, z);
+    }
+
+    private float calcY(float x, float z)
+    {
+        // Y = a * Sin(b * x + c) + d
+        // a = Amplitude
+        // b = Period (Frequency)
+        // c = Phase Shift (X Offset)
+        // d = Y Offset
+        return WaveAmplitude * Mathf.Sin(WaveFrequency * (x + Time.time * WaveSpeed)) + WaveAmplitude * Mathf.Sin(WaveFrequency * (z + Time.time * WaveSpeed));
     }
 }
