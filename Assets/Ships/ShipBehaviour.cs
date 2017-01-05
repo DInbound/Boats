@@ -14,6 +14,10 @@ public class ShipBehaviour : MonoBehaviour
     public float ShipMass = 0;
     public float ShipDensity = 0;
 
+    public float Thrust = 100f;
+
+    private float _gravity = 9.81f;
+
     private WaterMeshMaker _wmm;
 
     // Use this for initialization
@@ -43,24 +47,31 @@ public class ShipBehaviour : MonoBehaviour
         if (Controllable)
         {
             if (Input.GetKey(KeyCode.W))
-                myBody.AddRelativeForce(Vector3.forward * 100f);
+                myBody.AddRelativeForce(Vector3.forward * Thrust);
 
             if (Input.GetKey(KeyCode.S))
-                myBody.AddRelativeForce(Vector3.forward * -100f);
+                myBody.AddRelativeForce(Vector3.forward * -Thrust);
 
             if (Input.GetKey(KeyCode.D))
-                myBody.AddRelativeTorque(Vector3.up * -100f);
+                myBody.AddRelativeTorque(Vector3.up * -Thrust);
 
             if (Input.GetKey(KeyCode.A))
-                myBody.AddRelativeTorque(Vector3.up * 100f);
+                myBody.AddRelativeTorque(Vector3.up * Thrust);
         }
 
-        FloatyBoaty();
+        if (ShipDensity < 1)
+        {
+            FloatyBoaty();
+        }
+        else
+        {
+            SinkyBoaty();
+        }
     }
 
     private void FloatyBoaty()
     {
-        // Add some force to every object.
+        // Add some force to every part of the boat.
         foreach(GameObject part in Parts)
         {
             // Get the objects center of mass.
@@ -69,11 +80,27 @@ public class ShipBehaviour : MonoBehaviour
             float distance = _wmm.CalculateY(com) - com.y;
             // TODO Take in account the amount of buoyancy the ship has.
             // Calculate the amount of force that should be applied.
-            float force = 9.81f * distance;
+            float force = distance * _gravity;
 
             // Add the force
             myBody.AddForceAtPosition(Vector3.up * force, com);
             Debug.DrawLine(com, com + new Vector3(0, distance, 0), distance < 0 ? Color.green : Color.red);
+        }
+    }
+
+    private void SinkyBoaty()
+    {
+        // Add some force to every part of the boat.
+        foreach(GameObject part in Parts)
+        {            
+            // Get the objects center of mass.
+            Vector3 com = part.transform.position + part.GetComponent<BoatPart>().CenterOfMass;
+            // Calculate some force
+            float force = _gravity / (1 / ShipDensity);
+
+            // Add the force
+            myBody.AddForceAtPosition(Vector3.down * force, com);
+            Debug.DrawLine(com, com + new Vector3(0, force, 0), force < 0 ? Color.green : Color.red);
         }
     }
 
@@ -94,10 +121,10 @@ public class ShipBehaviour : MonoBehaviour
             amount++;
         }
 
-        this.GetComponent<Rigidbody>().mass = ShipMass;
 
         ShipDensity = totalDensity / amount;
         ShipVolume = totalVolume;
         ShipMass = totalMass;
+        this.GetComponent<Rigidbody>().mass = ShipMass;
     }
 }
