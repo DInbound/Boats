@@ -64,6 +64,7 @@ public class LandMeshMaker : MonoBehaviour
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         GetComponent<MeshFilter>().mesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     public float CalculateY(Vector3 pos)

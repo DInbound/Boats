@@ -20,13 +20,51 @@ public class WaterMeshMaker : MonoBehaviour
 
     void Start()
     {
+        List<Vector3> verts = new List<Vector3>();
+        List<Vector3> normals = new List<Vector3>();
+        List<int> indices = new List<int>();
+
+        int count = 0;
+
+        // O(n2)
+        for (int i = 0; i < sizeX; i++)
+        {
+            for (int j = 0; j < sizeY; j++)
+            {
+                // tri 1
+                verts.Add(new Vector3(i, 0, j));
+                verts.Add(new Vector3(i, 0, j + 1));
+                verts.Add(new Vector3(i + 1, 0, j));
+                // tri 2
+                verts.Add(new Vector3(i, 0, j + 1));
+                verts.Add(new Vector3(i + 1, 0, j + 1));
+                verts.Add(new Vector3(i + 1, 0, j));
+
+                for (int k = 0; k < 6; k++)
+                {
+                    indices.Add(count);
+                    normals.Add(Vector3.up);
+                    count++;
+                }
+            }
+        }
+
+        mesh = new Mesh();
+
+        mesh.vertices = verts.ToArray();
+        mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+        mesh.normals = normals.ToArray();
+        GetComponent<MeshFilter>().mesh = mesh;
     }
 
     void Update()
     {
-        GenerateMesh();
+        //GenerateMesh();
     }
 
+    /// <summary>
+    /// Obselete, mesh is now generated in the shader.
+    /// </summary>
     private void GenerateMesh()
     {
         List<Vector3> verts = new List<Vector3>();

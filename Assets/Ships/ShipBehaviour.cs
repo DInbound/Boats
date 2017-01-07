@@ -100,7 +100,7 @@ public class ShipBehaviour : MonoBehaviour
 
             // Add the force
             myBody.AddForceAtPosition(Vector3.down * force, com);
-            Debug.DrawLine(com, com + new Vector3(0, force, 0), force < 0 ? Color.green : Color.red);
+            Debug.DrawLine(com, com + new Vector3(0, -force, 0), force < 0 ? Color.green : Color.red);
         }
     }
 
