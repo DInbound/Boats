@@ -4,7 +4,11 @@ using System.Collections.Generic;
 
 public class WaterMeshMaker : MonoBehaviour
 {
-    public Mesh mesh;
+    private Mesh _mesh;
+
+    private List<Vector3> verts = new List<Vector3>();
+    private List<Vector3> normals = new List<Vector3>();
+    private List<int> indices = new List<int>();
 
     [Range(1, 100)]
     public int sizeX;
@@ -20,10 +24,6 @@ public class WaterMeshMaker : MonoBehaviour
 
     void Start()
     {
-        List<Vector3> verts = new List<Vector3>();
-        List<Vector3> normals = new List<Vector3>();
-        List<int> indices = new List<int>();
-
         int count = 0;
 
         // O(n2)
@@ -49,17 +49,20 @@ public class WaterMeshMaker : MonoBehaviour
             }
         }
 
-        mesh = new Mesh();
+        _mesh = new Mesh();
 
-        mesh.vertices = verts.ToArray();
-        mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-        mesh.normals = normals.ToArray();
-        GetComponent<MeshFilter>().mesh = mesh;
+        _mesh.vertices = verts.ToArray();
+        _mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+        _mesh.normals = normals.ToArray();
+        GetComponent<MeshFilter>().mesh = _mesh;
     }
 
     void Update()
     {
-        //GenerateMesh();
+        verts.Clear();
+        normals.Clear();
+        indices.Clear();
+        GenerateMesh();
     }
 
     /// <summary>
@@ -67,10 +70,6 @@ public class WaterMeshMaker : MonoBehaviour
     /// </summary>
     private void GenerateMesh()
     {
-        List<Vector3> verts = new List<Vector3>();
-        List<Vector3> normals = new List<Vector3>();
-        List<int> indices = new List<int>();
-
         int count = 0;
 
         // O(n2)
@@ -96,14 +95,14 @@ public class WaterMeshMaker : MonoBehaviour
             }
         }
 
-        mesh = new Mesh();
+        _mesh = new Mesh();
 
-        mesh.vertices = verts.ToArray();
-        mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-        mesh.normals = normals.ToArray();
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        GetComponent<MeshFilter>().mesh = mesh;
+        _mesh.vertices = verts.ToArray();
+        _mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+        _mesh.normals = normals.ToArray();
+        _mesh.RecalculateBounds();
+        _mesh.RecalculateNormals();
+        GetComponent<MeshFilter>().mesh = _mesh;
     }
 
     /// <summary>

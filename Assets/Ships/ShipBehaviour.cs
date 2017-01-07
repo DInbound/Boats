@@ -96,7 +96,7 @@ public class ShipBehaviour : MonoBehaviour
             // Get the objects center of mass.
             Vector3 com = part.transform.position + part.GetComponent<BoatPart>().CenterOfMass;
             // Calculate some force
-            float force = _gravity / (1 / ShipDensity);
+            float force = ShipDensity;
 
             // Add the force
             myBody.AddForceAtPosition(Vector3.down * force, com);
