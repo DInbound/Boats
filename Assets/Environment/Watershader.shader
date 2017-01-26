@@ -1,35 +1,30 @@
-﻿/*
-Unity Answer thingy:
-http://answers.unity3d.com/questions/175600/gpu-generated-mesh.html
-ShaderLab reference material:
-https://docs.unity3d.com/Manual/SL-Reference.html
-NVidia's CG stuffs:
-http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter26.html
+﻿// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
-*/
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 Shader "Custom/Watershader" {
-	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
-		_Glossiness ("Smoothness", Range(0,1)) = 0.75
-		_Metallic ("Metallic", Range(0,1)) = 0.25
+	Properties{
+		_Color("Color", Color) = (1,1,1,1)
+		_Glossiness("Smoothness", Range(0,1)) = 0.75
+		_Metallic("Metallic", Range(0,1)) = 0.25
 
 		// Variables for waves
-		_Amplitude ("Wave Amplitude", Range(0, 1)) = 0.2
-		_Frequency ("Wave Frequency", Range(0, 1)) = 0.3
-		_Speed ("Wave Speed", Range(0, 5)) = 1
+		_Amplitude("Wave Amplitude", Range(0, 1)) = 0.2
+		_Frequency("Wave Frequency", Range(0, 1)) = 0.3
+		_Speed("Wave Speed", Range(0, 5)) = 1
 	}
 	SubShader {
 		Tags { "Queue"="Transparent" "RenderType"="Transparent" }
 		LOD 200
 		
 		CGPROGRAM
+		#pragma vertex vert Lambert vertex:vert
 		#pragma surface surf Standard fullforwardshadows alpha
 		#pragma target 3.0
 
 		struct Input {
 			float2 uv_MainTex;
 		};
-		
+				
 		// Variables
 		half _Glossiness;
 		half _Metallic;
@@ -40,9 +35,46 @@ Shader "Custom/Watershader" {
 		half _Frequency;
 		half _Speed;
 
+		float sine(float x, float z)
+		{
+			// Y = a * Sin(b * x + c) + d
+			// a = Amplitude
+			// b = Period (Frequency)
+			// c = Phase Shift (X Offset)
+			// d = Y Offset
+
+			return _Amplitude * sin(_Frequency * (x + _Time.y * _Speed)) + _Amplitude * sin(_Frequency * (z + _Time.y * _Speed));
+		}
+
 		// Do stuff with verts here
-		void vert() {
-			// Something needs to happen to the Y-coord of the vert here.
+		void vert(inout appdata_full v) {
+			// Do all work in world space
+			float3 v0 = mul(unity_ObjectToWorld, v.vertex).xyz;
+
+			// Create two fake neighbor vertices.
+			float3 v1 = v0 + float3(0.05, 0, 0); // +X
+			float3 v2 = v0 + float3(0, 0, 0.05); // +Z
+
+			// Do animation stuff here
+
+			// Modify the real vertex
+			v0.y = sine(v0.x, v0.z);
+
+			// Modify the fake neighbors
+			v1.y = sine(v1.x, v1.z);
+			v2.y = sine(v2.x, v2.z);
+
+			// Solve worldspace normal
+			float3 vna = cross(v2 - v0, v1 - v0);
+
+			// Put normals back in object space
+			//float3 vn = mul(float3x3(unity_WorldToObject), vna);
+
+			// Normalize
+			//v.normal = normalize(vn);
+
+			// Put vertex back in object space
+			v.vertex.xyz = mul(unity_WorldToObject, v0);
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {

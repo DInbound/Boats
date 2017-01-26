@@ -77,7 +77,7 @@ public class ShipBehaviour : MonoBehaviour
             // Get the objects center of mass.
             Vector3 com = part.transform.position + part.GetComponent<BoatPart>().CenterOfMass;
             // Calculate how far the center of mass is from the water surface.
-            float distance = _wmm.CalculateY(com) - com.y;
+            float distance = _wmm.CalculateY(com.x, com.z) - com.y;
             // TODO Take in account the amount of buoyancy the ship has.
             // Calculate the amount of force that should be applied.
             float force = distance * _gravity;
