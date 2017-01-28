@@ -47,13 +47,13 @@ Shader "Custom/Watershader" {
 		}
 
 		// Do stuff with verts here
-		void vert(inout appdata_full v) {
+		void vert(inout appdata_base v) {
 			// Do all work in world space
 			float3 v0 = mul(unity_ObjectToWorld, v.vertex).xyz;
 
 			// Create two fake neighbor vertices.
-			float3 v1 = v0 + float3(0.05, 0, 0); // +X
-			float3 v2 = v0 + float3(0, 0, 0.05); // +Z
+			float3 v1 = v0 + float3(0.1, 0, 0); // +X
+			float3 v2 = v0 + float3(0, 0, 0.1); // +Z
 
 			// Do animation stuff here
 
@@ -68,10 +68,7 @@ Shader "Custom/Watershader" {
 			float3 vna = cross(v2 - v0, v1 - v0);
 
 			// Put normals back in object space
-			//float3 vn = mul(float3x3(unity_WorldToObject), vna);
-
-			// Normalize
-			//v.normal = normalize(vn);
+			v.normal = normalize(mul(unity_WorldToObject, vna));
 
 			// Put vertex back in object space
 			v.vertex.xyz = mul(unity_WorldToObject, v0);
