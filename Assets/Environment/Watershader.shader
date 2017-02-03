@@ -9,6 +9,7 @@ Shader "Custom/Watershader" {
 
 		// Variables for waves
 		_Amplitude("Wave Amplitude", Range(0, 1)) = 0.2
+		_RandomHeight("Random Noise Height", Range(0, 1)) = 0.1
 		_Frequency("Wave Frequency", Range(0, 1)) = 0.3
 		_Speed("Wave Speed", Range(0, 5)) = 1
 	}
@@ -32,8 +33,13 @@ Shader "Custom/Watershader" {
 
 		// Wavy thingies
 		half _Amplitude;
+		half _RandomHeight;
 		half _Frequency;
 		half _Speed;
+
+		float rand(float3 myVector) {
+			return frac(sin(dot(myVector, float3(12.9898, 78.233, 45.5432))) * 43758.5453);
+		}
 
 		float sine(float x, float z)
 		{
@@ -42,8 +48,13 @@ Shader "Custom/Watershader" {
 			// b = Period (Frequency)
 			// c = Phase Shift (X Offset)
 			// d = Y Offset
+			float returnThis = 0;
 
-			return _Amplitude * sin(_Frequency * (x + _Time.y * _Speed)) + _Amplitude * sin(_Frequency * (z + _Time.y * _Speed));
+			float random = rand(float3(x, 0, z));
+			returnThis += sin(_Time[1] * _Speed + x * _Frequency * _Frequency) * _Amplitude;
+			returnThis += sin(cos(random * 1.0f) * _RandomHeight * cos(_Time[1] * _Speed * sin(random * 1.0f)));
+			return returnThis;
+			//return _Amplitude * sin(_Frequency * (x + _Time.y * _Speed)) + _Amplitude * sin(_Frequency * (z + _Time.y * _Speed));
 		}
 
 		// Do stuff with verts here
