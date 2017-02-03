@@ -1,7 +1,4 @@
-﻿// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-Shader "Custom/Watershader" {
+﻿Shader "Custom/Watershader" {
 	Properties{
 		_Color("Color", Color) = (1,1,1,1)
 		_Glossiness("Smoothness", Range(0,1)) = 0.75
@@ -43,11 +40,6 @@ Shader "Custom/Watershader" {
 
 		float sine(float x, float z)
 		{
-			// Y = a * Sin(b * x + c) + d
-			// a = Amplitude
-			// b = Period (Frequency)
-			// c = Phase Shift (X Offset)
-			// d = Y Offset
 			float returnThis = 0;
 
 			float random = rand(float3(x, 0, z));

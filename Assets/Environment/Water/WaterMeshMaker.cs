@@ -11,9 +11,9 @@ public class WaterMeshMaker : MonoBehaviour
     private List<int> indices = new List<int>();
 
     [Range(1, 100)]
-    public int sizeX;
+    public int sizeX = 100;
     [Range(1, 100)]
-    public int sizeY;
+    public int sizeY = 100;
     [Range(0, 1)]
     public float Amplitude;
     [Range(0, 1)]
