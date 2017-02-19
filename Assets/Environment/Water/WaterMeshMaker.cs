@@ -58,15 +58,52 @@ public class WaterMeshMaker : MonoBehaviour
 
     void Update()
     {
+        float x = Raycast(new Vector3(0f, 10f, 0f));
     }
 
+    /// <summary>
+    /// Return the Y value of the water at a specific x and z position.
+    /// </summary>
+    /// <param name="x">X position</param>
+    /// <param name="z">Z position</param>
+    /// <returns>A certain height of water.</returns>
     public float CalculateY(float x, float z)
     {
-        // Y = a * Sin(b * x + c) + d
-        // a = Amplitude
-        // b = Period (Frequency)
-        // c = Phase Shift (X Offset)
-        // d = Y Offset
-        return Amplitude * Mathf.Sin(Frequency * (x + Time.time * Speed)) + Amplitude * Mathf.Sin(Frequency * (z + Time.time * Speed));
+        return Sine(x, z);
+    }
+
+    private float Sine(float x, float z)
+    {
+        float returnThis = 0;
+
+        float random = Rand(new Vector3(x, 0, z));
+        returnThis += Mathf.Sin(Time.time * Speed + x * Frequency * Frequency) * Amplitude;
+        return returnThis;
+    }
+
+    /// <summary>
+    /// Should be the same as in the shader.
+    /// </summary>
+    /// <returns>a semi random value</returns>
+    private float Rand(Vector3 vec)
+    {
+        // TODO FIXME HALP: do fractal thingy.
+        // return frac(sin(dot(myVector, float3(12.9898, 78.233, 45.5432))) * 43758.5453);
+        float x = Mathf.Sin(  Vector3.Dot(vec, new Vector3(12.9898f, 78.233f, 45.5432f))) * 43758.5453f;
+
+        return x - Mathf.Floor(x);
+    }
+
+    public float Raycast(Vector3 position)
+    {
+        RaycastHit hitInfo = new RaycastHit();
+        float aDistance = 9999;
+        int layerMask = 1 << 4;
+
+        if(Physics.Raycast(position, transform.TransformDirection(Vector3.down), 100f, layerMask, QueryTriggerInteraction.UseGlobal))
+        {
+            aDistance = hitInfo.distance;
+        }
+        return aDistance;
     }
 }

@@ -50,9 +50,11 @@
 		}
 
 		// Do stuff with verts here
-		void vert(inout appdata_base v) {
+		void vert(inout appdata_base v) 
+		{
 			// Do all work in world space
-			float3 v0 = mul(unity_ObjectToWorld, v.vertex).xyz;
+			//float3 v0 = mul(unity_ObjectToWorld, v.vertex).xyz;
+			float3 v0 = v.vertex.xyz;
 
 			// Create two fake neighbor vertices.
 			float3 v1 = v0 + float3(0.1, 0, 0); // +X
@@ -74,7 +76,7 @@
 			v.normal = normalize(mul(unity_WorldToObject, vna));
 
 			// Put vertex back in object space
-			v.vertex.xyz = mul(unity_WorldToObject, v0);
+			v.vertex.xyz = v0;
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {

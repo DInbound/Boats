@@ -6,9 +6,10 @@ public class ShipBehaviour : MonoBehaviour
 {
     public bool Controllable = false;
 
-    public List<GameObject> Parts = new List<GameObject>();
+    public GameObject PartList;
+    private List<GameObject> _parts = new List<GameObject>();
 
-    public Rigidbody myBody;
+    private Rigidbody _myBody;
 
     public float ShipVolume = 0;
     public float ShipMass = 0;
@@ -16,21 +17,23 @@ public class ShipBehaviour : MonoBehaviour
 
     public float Thrust = 100f;
 
-    private float _gravity = 9.81f;
+    private float _gravity = -9.81f;
 
     private WaterMeshMaker _wmm;
+
+    
 
     // Use this for initialization
     void Start()
     {
         _wmm = GameObject.FindWithTag("Water").GetComponent<WaterMeshMaker>();
 
-        myBody = GetComponent<Rigidbody>();
+        _myBody = GetComponent<Rigidbody>();
 
-        foreach (Transform child in this.transform)
+        foreach (Transform child in PartList.transform)
         {
             if(child.CompareTag("Part"))
-                Parts.Add(child.gameObject);
+                _parts.Add(child.gameObject);
         }
 
         UpdatePartStats();
@@ -47,16 +50,16 @@ public class ShipBehaviour : MonoBehaviour
         if (Controllable)
         {
             if (Input.GetKey(KeyCode.W))
-                myBody.AddRelativeForce(Vector3.forward * Thrust);
+                _myBody.AddRelativeForce(Vector3.forward * Thrust);
 
             if (Input.GetKey(KeyCode.S))
-                myBody.AddRelativeForce(Vector3.forward * -Thrust);
+                _myBody.AddRelativeForce(Vector3.forward * -Thrust);
 
             if (Input.GetKey(KeyCode.D))
-                myBody.AddRelativeTorque(Vector3.up * -Thrust);
+                _myBody.AddRelativeTorque(Vector3.up * -Thrust);
 
             if (Input.GetKey(KeyCode.A))
-                myBody.AddRelativeTorque(Vector3.up * Thrust);
+                _myBody.AddRelativeTorque(Vector3.up * Thrust);
         }
 
         if (ShipDensity < 1)
@@ -72,7 +75,7 @@ public class ShipBehaviour : MonoBehaviour
     private void FloatyBoaty()
     {
         // Add some force to every part of the boat.
-        foreach(GameObject part in Parts)
+        foreach(GameObject part in _parts)
         {
             // Get the objects center of mass.
             Vector3 com = part.transform.position + part.GetComponent<BoatPart>().CenterOfMass;
@@ -80,10 +83,13 @@ public class ShipBehaviour : MonoBehaviour
             float distance = _wmm.CalculateY(com.x, com.z) - com.y;
             // TODO Take in account the amount of buoyancy the ship has.
             // Calculate the amount of force that should be applied.
-            float force = distance * _gravity;
+            float force = distance * -_gravity;
+
+            if (distance < 0)
+                force = _gravity / 10;
 
             // Add the force
-            myBody.AddForceAtPosition(Vector3.up * force, com);
+            _myBody.AddForceAtPosition(Vector3.up * force, com);
             Debug.DrawLine(com, com + new Vector3(0, distance, 0), distance < 0 ? Color.green : Color.red);
         }
     }
@@ -91,7 +97,7 @@ public class ShipBehaviour : MonoBehaviour
     private void SinkyBoaty()
     {
         // Add some force to every part of the boat.
-        foreach(GameObject part in Parts)
+        foreach(GameObject part in _parts)
         {            
             // Get the objects center of mass.
             Vector3 com = part.transform.position + part.GetComponent<BoatPart>().CenterOfMass;
@@ -99,7 +105,7 @@ public class ShipBehaviour : MonoBehaviour
             float force = ShipDensity;
 
             // Add the force
-            myBody.AddForceAtPosition(Vector3.down * force, com);
+            _myBody.AddForceAtPosition(Vector3.down * force, com);
             Debug.DrawLine(com, com + new Vector3(0, -force, 0), force < 0 ? Color.green : Color.red);
         }
     }
@@ -111,7 +117,7 @@ public class ShipBehaviour : MonoBehaviour
         float totalMass = 0;
         int amount = 0;
 
-        foreach (GameObject part in Parts)
+        foreach (GameObject part in _parts)
         {
             BoatPart boatPartScript = part.GetComponent<BoatPart>();
             // NEEDS FIX
