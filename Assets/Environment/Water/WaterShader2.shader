@@ -70,14 +70,14 @@ Shader "Custom/LowPolyWaves 2.0"
 
 	v2g vert(appdata_full v)
 	{
-		float3 v0 = mul(unity_ObjectToWorld, v.vertex).xyz;
+		float3 v0 = v.vertex.xyz;
 
 		float phase0 = (_WaveHeight)* sin((_Time[1] * _WaveSpeed) + (v0.x * _WaveLength) + (v0.z * _WaveLength) + rand2(v0.xzz));
 		float phase0_1 = (_RandomHeight)*sin(cos(rand(v0.xzz) * _RandomHeight * cos(_Time[1] * _RandomSpeed * sin(rand(v0.xxz)))));
 
 		v0.y += phase0 + phase0_1;
 
-		v.vertex.xyz = mul((float3x3)unity_WorldToObject, v0);
+		v.vertex.xyz = v0;
 
 		v2g OUT;
 		OUT.pos = v.vertex;

@@ -13,19 +13,19 @@ public class CameraControl : MonoBehaviour
     public float Sensitivity = 1f;
 
     public float MaxCamHeight = 10f;
+    private float _maxAngle = 60f;
 
 
     // Use this for initialization
     public void Start()
     {
-        _target = this.transform.parent.gameObject;
+        _target = this.transform.parent.parent.gameObject;
         _camera = this.GetComponent<Camera>();
     }
 
     // Update is called once per frame
     public void Update()
     {
-        // TODO : FIXME rotate target and move camera forwards/backwards to zoom
         Pan();
         Zoom();
     }
@@ -36,19 +36,14 @@ public class CameraControl : MonoBehaviour
         _target.transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X") * Sensitivity, 0));
 
         // Rotate the camera on the x axis
-        // todo limit to the actual values (60 and -60 degrees) idk why it ignores this.
-        if (transform.rotation.x > 60)
-            transform.rotation = new Quaternion(60, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-        else if (transform.rotation.x < -60)
-            transform.rotation = new Quaternion(-60, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-        else
-            transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y") * Sensitivity, 0, 0));
+        transform.Rotate(new Vector3(-Input.GetAxis("Mouse Y") * Sensitivity, 0, 0));
+        transform.localEulerAngles = new Vector3(Mathf.Clamp(transform.localEulerAngles.x, 90f - _maxAngle, 90f + _maxAngle), 0, 0);
 
         // Move the camera up and down.
         if (transform.rotation.x <= 0)
             transform.position = new Vector3(transform.position.x, _target.transform.position.y, transform.position.z);
         else
-            transform.position = new Vector3(transform.position.x, _target.transform.position.y + 90 * Mathf.Sin(transform.rotation.x), transform.position.z);
+            transform.position = new Vector3(transform.position.x, _target.transform.position.y + 45f * Mathf.Sin(transform.rotation.x), transform.position.z);
     }
 
     private void Zoom()
